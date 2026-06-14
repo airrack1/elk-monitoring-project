@@ -239,6 +239,11 @@ def cmd_run(args) -> None:
         _ok(f"  would run: {result['command']}")
 
 
+def cmd_serve(args) -> None:
+    from . import web
+    web.serve(host=args.host, port=args.port, token=args.token)
+
+
 def cmd_report(args) -> None:
     eng = _resolve(args.engagement)
     md = report.markdown_report(eng)
@@ -344,6 +349,13 @@ def build_parser() -> argparse.ArgumentParser:
     sp = sub.add_parser("report", help="Generate a Markdown report.")
     sp.add_argument("--out", help="Write to file instead of stdout.")
     sp.set_defaults(func=cmd_report)
+
+    sp = sub.add_parser("serve", help="Start the mobile web UI + REST API.")
+    sp.add_argument("--host", default="127.0.0.1",
+                    help="Bind address. Use 0.0.0.0 to reach it from your phone on the LAN/VPN.")
+    sp.add_argument("--port", type=int, default=8765)
+    sp.add_argument("--token", help="Access token (else NETAUDIT_TOKEN or a random one).")
+    sp.set_defaults(func=cmd_serve)
 
     return p
 

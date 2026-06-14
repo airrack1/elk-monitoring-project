@@ -73,6 +73,47 @@ netaudit finding add --title "Telnet exposed" --severity high --host 192.168.10.
 netaudit report --out acme-q2-report.md
 ```
 
+## Run it from your phone (web UI)
+
+`netaudit` ships a mobile-first web app and REST API. Because the scope-guarded
+runner has to launch tools (`nmap`, etc.) on a host that's actually on the client
+network, you run the server on your **on-site testing box** (laptop/NUC/VPS) and use
+your **phone's browser as the control surface**.
+
+```bash
+# On the testing host, reachable from your phone (same LAN/VPN):
+netaudit serve --host 0.0.0.0 --port 8765
+```
+
+It prints a URL with an access token, e.g.
+`http://localhost:8765/?token=Xy7…`. On your phone, open the same URL but swap
+`localhost` for the testing host's LAN/VPN IP (e.g. `http://192.168.1.20:8765/?token=Xy7…`).
+"Add to Home Screen" gives you an app-like icon.
+
+From the phone you can do everything the CLI does: create jobs, set the
+authorization gate, manage scope, tap through phase checklists, log findings,
+trigger scope-guarded scans (dry-run or execute), and view/download the report.
+
+**Access & safety**
+- Every API call requires the token (`NETAUDIT_TOKEN`, `--token`, or an
+  auto-generated one). The token is the only thing protecting a server that can
+  launch tooling — keep the URL secret.
+- Prefer a **VPN or SSH tunnel** over exposing the port to untrusted networks:
+  `ssh -L 8765:localhost:8765 you@testing-host` then open `http://localhost:8765`
+  on the phone — no `0.0.0.0` bind needed.
+- All the same gates apply server-side: no run without authorization + a complete
+  Phase 0, out-of-scope/excluded targets are refused, exploitation/cracking stay
+  manual.
+
+### Hosting it elsewhere (Lovable / cloud)
+
+The frontend (`netaudit/web_static/index.html`) is a dependency-free single page
+that talks to the REST API, so you can rebuild/restyle it in a tool like Lovable
+and point it at your `netaudit serve` backend (set the token, call `/api/...`). But
+note: a cloud-hosted server can only run scans against hosts it can actually reach.
+For real engagements, keep the *runner* on the on-site box; a cloud instance is fine
+as a pure tracking/reporting surface (just don't rely on `run --execute` there).
+
 ## Commands
 
 | Command | Purpose |
@@ -88,6 +129,7 @@ netaudit report --out acme-q2-report.md
 | `tools` | Check the master tool inventory against your `$PATH` |
 | `run` | Scope-guarded discovery/enumeration runner |
 | `report` | Generate a Markdown report |
+| `serve` | Start the mobile web UI + REST API |
 
 ## What the runner will (and won't) do
 

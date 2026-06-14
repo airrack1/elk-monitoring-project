@@ -22,4 +22,4 @@ dev = ["pytest>=7"]
 include = ["netaudit*"]
 
 [tool.setuptools.package-data]
-netaudit = ["data/*.py"]
+netaudit = ["data/*.py", "web_static/*"]
