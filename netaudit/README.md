@@ -105,7 +105,22 @@ trigger scope-guarded scans (dry-run or execute), and view/download the report.
   Phase 0, out-of-scope/excluded targets are refused, exploitation/cracking stay
   manual.
 
-### Hosting it elsewhere (Lovable / cloud)
+### Access from anywhere (cloud server + on-site agent)
+
+To drive engagements from your phone **anywhere** while still scanning real client
+networks, run the canonical server in the cloud and a thin **agent** on-site:
+
+```bash
+# on-site box (on the client network):
+netaudit agent --server https://your-cloud-host --eng eng-1a2b3c4d host-discovery 192.168.1.50 --execute
+```
+
+The agent pulls the engagement from the cloud, re-checks the gates locally
+(authorization + Phase 0 + scope), runs the scan on-site, and uploads the captured
+output back to the cloud as evidence — so your phone sees everything in one place.
+Full instructions, Docker image, and Render/Fly configs are in **[DEPLOY.md](DEPLOY.md)**.
+
+### Hosting the frontend elsewhere (Lovable / custom)
 
 The frontend (`netaudit/web_static/index.html`) is a dependency-free single page
 that talks to the REST API, so you can rebuild/restyle it in a tool like Lovable
@@ -130,6 +145,7 @@ as a pure tracking/reporting surface (just don't rely on `run --execute` there).
 | `run` | Scope-guarded discovery/enumeration runner |
 | `report` | Generate a Markdown report |
 | `serve` | Start the mobile web UI + REST API |
+| `agent` | On-site runner for a cloud-hosted engagement (scans locally, uploads evidence) |
 
 ## What the runner will (and won't) do
 

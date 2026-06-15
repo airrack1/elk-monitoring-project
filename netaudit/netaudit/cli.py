@@ -244,6 +244,30 @@ def cmd_serve(args) -> None:
     web.serve(host=args.host, port=args.port, token=args.token)
 
 
+def cmd_agent(args) -> None:
+    import os
+    from . import agent, runner as _runner
+    token = args.token or os.environ.get("NETAUDIT_TOKEN")
+    if not token:
+        raise SystemExit("agent needs a token: pass --token or set NETAUDIT_TOKEN.")
+    try:
+        result = agent.run_remote(
+            args.server, token, args.eng, args.runner, args.target,
+            execute=args.execute, timeout=args.timeout,
+        )
+    except _runner.PreflightError as exc:
+        raise SystemExit(str(exc))
+    except agent.RemoteError as exc:
+        raise SystemExit(f"remote error: {exc}")
+    if result.get("executed"):
+        _ok(f"Ran on-site: {result['command']}  (rc={result['return_code']})")
+        _ok(f"  uploaded evidence -> {result.get('uploaded_evidence')} on {result.get('server')}")
+        _ok(f"  local copy: {result['output_path']}")
+    else:
+        _ok("DRY RUN (nothing executed). Add --execute to run for real.")
+        _ok(f"  would run: {result['command']}")
+
+
 def cmd_report(args) -> None:
     eng = _resolve(args.engagement)
     md = report.markdown_report(eng)
@@ -356,6 +380,19 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--port", type=int, default=8765)
     sp.add_argument("--token", help="Access token (else NETAUDIT_TOKEN or a random one).")
     sp.set_defaults(func=cmd_serve)
+
+    sp = sub.add_parser(
+        "agent",
+        help="On-site runner: scan locally for a cloud-hosted engagement and upload evidence.",
+    )
+    sp.add_argument("--server", required=True, help="Cloud netaudit base URL, e.g. https://netaudit.example.com")
+    sp.add_argument("--eng", required=True, help="Engagement id on the server.")
+    sp.add_argument("--token", help="Server access token (else NETAUDIT_TOKEN).")
+    sp.add_argument("runner", help="Runner name (see `netaudit run --list`).")
+    sp.add_argument("target", help="In-scope target.")
+    sp.add_argument("--execute", action="store_true", help="Actually run (default: dry-run).")
+    sp.add_argument("--timeout", type=int, default=3600)
+    sp.set_defaults(func=cmd_agent)
 
     return p
 

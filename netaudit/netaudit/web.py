@@ -222,8 +222,19 @@ class Handler(BaseHTTPRequestHandler):
                 return self._send(201, {"finding": f.to_dict(), "engagement": _engagement_payload(eng)})
 
             if action == "evidence":
+                path = body.get("path", "")
+                content = body.get("content")
+                if content is not None:
+                    # An agent (or the UI) uploaded captured output; persist it
+                    # to this server's evidence directory and link it.
+                    import re
+                    from .runner import evidence_dir
+                    base = re.sub(r"[^A-Za-z0-9_.-]", "_", body.get("filename") or body["summary"])[:60]
+                    out = evidence_dir(eng) / (base or "evidence")
+                    out.write_text(content, encoding="utf-8")
+                    path = str(out)
                 e = eng.add_evidence(body.get("kind", "note"), body["summary"],
-                                     path=body.get("path", ""), item_id=body.get("item_id", ""))
+                                     path=path, item_id=body.get("item_id", ""))
                 storage.save(eng)
                 return self._send(201, {"evidence": e.to_dict()})
 
