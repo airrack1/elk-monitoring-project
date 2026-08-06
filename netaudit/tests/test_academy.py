@@ -63,7 +63,7 @@ def test_accessibility_and_iphone_compatibility_guards():
     assert ".at(" not in text
     for marker in [
         "interactive-widget=resizes-content",
-        "grid-template-columns:repeat(7,minmax(0,1fr))",
+        "grid-template-columns:repeat(6,minmax(0,1fr))",
         ".keyboard-open .sidebar",
         "window.visualViewport",
         "overflow-x:hidden",
@@ -76,3 +76,27 @@ def test_phone_nav_labels_can_shrink_without_widening_the_page():
         source = (STATIC / page).read_text(encoding="utf-8")
         assert 'class="nav-label"' in source
         assert "min-width:0;overflow:hidden" in source
+
+
+def test_terminal_is_a_draggable_persistent_utility():
+    assert "['terminal','" not in text
+    for marker in [
+        'id="terminalFab"',
+        'id="floatingTerminal"',
+        "pointerdown",
+        "setPointerCapture",
+        "function openFloatingTerminal",
+        "function renderLabDetail",
+    ]:
+        assert marker in text
+
+
+def test_boxes_open_details_and_tracking_stays_in_profile():
+    assert "view='lab'" in text
+    assert 'target="_blank" rel="noopener noreferrer"' in text
+    assert "function boxTrackingRows" in text
+    dashboard = text[text.index("function renderDashboard"):text.index("function labCard")]
+    assert "Boxes complete" not in dashboard
+    lab_card = text[text.index("function labCard"):text.index("function renderStudies")]
+    assert "lab-progress" not in lab_card
+    assert "Completed" not in lab_card
