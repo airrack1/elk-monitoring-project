@@ -61,3 +61,18 @@ def test_accessibility_and_iphone_compatibility_guards():
         assert marker in text
     assert "findLast(" not in text
     assert ".at(" not in text
+    for marker in [
+        "interactive-widget=resizes-content",
+        "grid-template-columns:repeat(7,minmax(0,1fr))",
+        ".keyboard-open .sidebar",
+        "window.visualViewport",
+        "overflow-x:hidden",
+    ]:
+        assert marker in text
+
+
+def test_phone_nav_labels_can_shrink_without_widening_the_page():
+    for page in ["index.html", "standalone.src.html"]:
+        source = (STATIC / page).read_text(encoding="utf-8")
+        assert 'class="nav-label"' in source
+        assert "min-width:0;overflow:hidden" in source

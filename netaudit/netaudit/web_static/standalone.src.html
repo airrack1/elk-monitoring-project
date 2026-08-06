@@ -30,9 +30,9 @@
   --ink-on-solid:#ffffff;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--txt);
+html,body{margin:0;background:var(--bg);color:var(--txt);overflow-x:hidden;
   font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  -webkit-text-size-adjust:100%}
+  -webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{padding-bottom:calc(78px + env(safe-area-inset-bottom))}
 .hdr{position:sticky;top:0;z-index:5;background:var(--bg);
   padding:calc(12px + env(safe-area-inset-top)) 16px 10px 16px;border-bottom:1px solid var(--line);
@@ -91,8 +91,9 @@ label{font-size:12px;color:var(--muted);display:block;margin-top:6px}
   border-top:1px solid var(--line);display:flex;
   padding:6px 2px calc(6px + env(safe-area-inset-bottom));justify-content:space-around}
 .nav button{background:none;border:none;color:var(--muted);font-size:10.5px;font-weight:600;
-  display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 4px;flex:1;min-width:0}
+  display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 2px;flex:1 1 0;min-width:0;overflow:hidden}
 .nav button .ic{font-size:18px;line-height:1}
+.nav button .nav-label{display:block;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
 .nav button.active{color:var(--accent)}
 pre{white-space:pre-wrap;word-break:break-word;background:var(--field);border:1px solid var(--line);
   border-radius:10px;padding:12px;font-size:12.5px;overflow-x:auto;max-height:58vh;overflow-y:auto;
@@ -117,6 +118,7 @@ pre{white-space:pre-wrap;word-break:break-word;background:var(--field);border:1p
 code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--field);
   padding:1px 5px;border-radius:5px;font-size:.92em;border:1px solid var(--line)}
 a{color:var(--accent)}
+@media(max-width:420px){.nav button{font-size:10px;padding-inline:1px}.nav button .ic{font-size:16px}}
 </style>
 
 <div class="hdr">
@@ -143,7 +145,7 @@ a{color:var(--accent)}
   if(document.querySelector('meta[name="viewport"]')) return;
   const m=document.createElement("meta");
   m.name="viewport";
-  m.content="width=device-width, initial-scale=1, viewport-fit=cover";
+  m.content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content";
   (document.head||document.documentElement).appendChild(m);
 })();
 
@@ -450,7 +452,7 @@ const TABS=[
 function renderNav(){
   $("#nav").innerHTML=TABS.map(t=>
     `<button data-tab="${t.id}" class="${STATE.tab===t.id?"active":""}">
-      <span class="ic">${t.ic}</span>${t.label}</button>`).join("");
+      <span class="ic">${t.ic}</span><span class="nav-label">${t.label}</span></button>`).join("");
   $("#nav").querySelectorAll("button").forEach(b=>b.onclick=()=>{
     if(b.dataset.tab!=="engagements" && !STATE.eng){ toast("Pick or create a job first"); return; }
     STATE.tab=b.dataset.tab; STATE.openPhase=null; render();

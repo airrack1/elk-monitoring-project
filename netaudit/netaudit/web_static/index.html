@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="theme-color" content="#0b1220">
 <title>netaudit</title>
 <link rel="icon" href="data:,">
@@ -13,9 +13,10 @@
   --crit:#ff5a5a; --high:#ff8a3d; --med:#f0b03a; --low:#5cc8ff; --info:#8ea0c4;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--txt);
-  font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-body{padding-bottom:74px}
+html,body{margin:0;background:var(--bg);color:var(--txt);overflow-x:hidden;
+  font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  -webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{padding-bottom:calc(74px + env(safe-area-inset-bottom))}
 header{position:sticky;top:0;z-index:5;background:var(--bg);
   padding:14px 16px calc(10px + env(safe-area-inset-top)) 16px;border-bottom:1px solid var(--line);
   display:flex;align-items:center;gap:10px}
@@ -65,8 +66,9 @@ label{font-size:12px;color:var(--muted);display:block;margin-top:6px}
 nav{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--panel);border-top:1px solid var(--line);
   display:flex;padding:6px 4px calc(6px + env(safe-area-inset-bottom));justify-content:space-around}
 nav button{background:none;border:none;color:var(--muted);font-size:11px;font-weight:600;
-  display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 8px;flex:1}
+  display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 2px;flex:1 1 0;min-width:0;overflow:hidden}
 nav button .ic{font-size:18px}
+nav button .nav-label{display:block;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
 nav button.active{color:var(--accent)}
 pre{white-space:pre-wrap;word-break:break-word;background:#0d1426;border:1px solid var(--line);
   border-radius:10px;padding:12px;font-size:12.5px;overflow-x:auto;max-height:60vh;overflow-y:auto}
@@ -80,6 +82,7 @@ pre{white-space:pre-wrap;word-break:break-word;background:#0d1426;border:1px sol
 .tag b{color:var(--txt);font-weight:600}
 .dot{width:8px;height:8px;border-radius:50%}.dot.ok{background:var(--ok)}.dot.no{background:var(--crit)}
 a{color:var(--accent)}
+@media(max-width:420px){nav button{font-size:10px;padding-inline:1px}nav button .ic{font-size:16px}}
 </style>
 </head>
 <body>
@@ -127,7 +130,7 @@ const TABS=[
 
 function renderNav(){
   $('#nav').innerHTML=TABS.map(t=>`<button data-tab="${t.id}" class="${STATE.tab===t.id?'active':''}">
-    <span class="ic">${t.ic}</span>${t.label}</button>`).join('');
+    <span class="ic">${t.ic}</span><span class="nav-label">${t.label}</span></button>`).join('');
   $('#nav').querySelectorAll('button').forEach(b=>b.onclick=()=>{
     if(b.dataset.tab!=='engagements'&&!STATE.engId){toast('Pick or create a job first');return;}
     STATE.tab=b.dataset.tab;render();});
