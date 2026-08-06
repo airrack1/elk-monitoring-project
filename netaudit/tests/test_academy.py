@@ -102,3 +102,18 @@ def test_boxes_open_details_and_tracking_stays_in_profile():
     lab_card = text[text.index("function labCard"):text.index("function renderStudies")]
     assert "lab-progress" not in lab_card
     assert "Completed" not in lab_card
+
+
+def test_box_guide_and_live_terminal_objectives_are_present():
+    for marker in [
+        "function labSlides",
+        "function setLabSlide",
+        "Guide ${labSlide+1} of ${slides.length}",
+        "Build an investigation plan",
+        "Ready for safe practice",
+        'id="terminalObjectives"',
+        "function renderTerminalObjectives",
+        "renderTerminalObjectives(l);",
+        "let guestLabs={}",
+    ]:
+        assert marker in text
