@@ -40,7 +40,10 @@ body{padding-bottom:calc(78px + env(safe-area-inset-bottom))}
 .hdr h1{font-size:17px;margin:0;font-weight:700;letter-spacing:.3px}
 .hdr .sub{color:var(--muted);font-size:12px;max-width:52vw;overflow:hidden;
   text-overflow:ellipsis;white-space:nowrap}
-.badge{margin-left:auto;font-size:11px;font-weight:700;padding:4px 9px;border-radius:20px;
+.header-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.academy-link{border:1px solid var(--line);background:var(--panel2);color:var(--txt);text-decoration:none;
+  padding:6px 9px;border-radius:10px;font-size:12px;font-weight:700}
+.badge{font-size:11px;font-weight:700;padding:4px 9px;border-radius:20px;
   border:1px solid var(--line);color:var(--muted);white-space:nowrap}
 .badge.ok{color:var(--ok);border-color:var(--ok)}
 .badge.no{color:var(--crit);border-color:var(--crit)}
@@ -121,7 +124,10 @@ a{color:var(--accent)}
     <h1>netaudit</h1>
     <div class="sub" id="hsub">engagement control</div>
   </div>
-  <span class="badge" id="authBadge">—</span>
+  <div class="header-actions">
+    <a class="academy-link" href="./academy.html">Academy</a>
+    <span class="badge" id="authBadge">—</span>
+  </div>
 </div>
 
 <main id="view"></main>

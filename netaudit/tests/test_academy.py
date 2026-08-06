@@ -1,0 +1,63 @@
+from pathlib import Path
+import re
+
+HTML = Path(__file__).parents[1] / "netaudit" / "web_static" / "academy.html"
+text = HTML.read_text(encoding="utf-8")
+STATIC = HTML.parent
+
+
+def test_single_file_app_has_requested_surfaces():
+    for phrase in [
+        "Study boxes",
+        "Deep-dive forums",
+        "defense room",
+        "Badges",
+        "Kali/Linux-style terminal",
+    ]:
+        assert phrase.lower() in text.lower()
+
+
+def test_lab_and_scenario_depth():
+    assert text.count("track:'Frontend'") >= 4
+    assert text.count("track:'Backend'") >= 4
+    assert text.count("track:'Security'") >= 3
+    assert text.count("type:'") >= 10
+
+
+def test_repeat_limit_is_enforced():
+    assert "(p.attackCounts[s.type]||0)<2" in text
+    assert "No incident type is selected more than twice" in text
+
+
+def test_no_real_shell_execution_apis():
+    forbidden = ["child_process", "os.system", "subprocess", "eval(", "new Function("]
+    for token in forbidden:
+        assert token not in text
+
+
+def test_cisa_feed_and_safety_copy():
+    assert "known_exploited_vulnerabilities.json" in text
+    assert "does not replay exploit code" in text
+
+
+def test_navigation_is_visible_in_both_phone_surfaces():
+    for page in ["index.html", "standalone.src.html"]:
+        source = (STATIC / page).read_text(encoding="utf-8")
+        assert 'href="./academy.html"' in source
+        assert ">Academy</a>" in source
+    assert 'href="./"' in text
+
+
+def test_local_data_is_versioned_and_storage_failures_are_visible():
+    assert "const DB_VERSION=2" in text
+    assert "function migrateDB" in text
+    assert "Math.min(2" in text
+    assert 'id="storageWarning"' in text
+    assert "memory only" in text
+
+
+def test_accessibility_and_iphone_compatibility_guards():
+    for marker in ['aria-modal="true"', 'aria-live="polite"', ":focus-visible"]:
+        assert marker in text
+    assert "findLast(" not in text
+    assert ".at(" not in text

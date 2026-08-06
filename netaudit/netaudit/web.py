@@ -106,6 +106,10 @@ class Handler(BaseHTTPRequestHandler):
         path, query = parsed.path, parse_qs(parsed.query)
         if not path.startswith("/api/"):
             return self._serve_static(path)
+        # Hosting platforms call the configured health check without the
+        # private bearer token. This endpoint exposes no engagement data.
+        if path == "/api/ping":
+            return self._send(200, {"ok": True})
         if not self._authed(query):
             return self._err(401, "missing or invalid token")
         try:
@@ -274,6 +278,7 @@ def serve(host="127.0.0.1", port=8765, token=None):
     print(f"  Local URL : {url}")
     print(f"  Offline   : http://{shown_host}:{port}/standalone.html  (no token, no API,")
     print("              runs entirely in the browser — save it for offline use)")
+    print(f"  Academy   : http://{shown_host}:{port}/academy.html  (safe training simulations)")
     if host == "0.0.0.0":
         print("  Phone     : replace 'localhost' with this machine's LAN/VPN IP, keep the token.")
         print("  WARNING   : bound to 0.0.0.0 (all interfaces). Token is the only thing")

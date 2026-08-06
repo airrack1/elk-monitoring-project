@@ -35,6 +35,12 @@ def test_requires_token(server):
     assert code == 401
 
 
+def test_ping_is_public_for_platform_health_checks(server):
+    code, payload = call(server, "/api/ping", token=None)
+    assert code == 200
+    assert payload == {"ok": True}
+
+
 def test_create_and_gate_flow(server):
     code, eng = call(server, "/api/engagements", "POST", {"name": "web-test", "client": "Acme"})
     assert code == 201
@@ -70,3 +76,9 @@ def test_static_ui_served(server):
     with urllib.request.urlopen(req) as resp:
         html = resp.read().decode()
     assert "netaudit" in html and "<!DOCTYPE html>" in html
+
+    with urllib.request.urlopen(server + "/academy.html") as resp:
+        academy = resp.read().decode()
+    assert resp.status == 200
+    assert "netaudit Academy" in academy
+    assert "safe browser lab" in academy
