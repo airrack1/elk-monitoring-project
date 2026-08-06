@@ -272,6 +272,8 @@ def serve(host="127.0.0.1", port=8765, token=None):
     url = f"http://{shown_host}:{port}/?token={token}"
     print("netaudit web UI running.")
     print(f"  Local URL : {url}")
+    print(f"  Offline   : http://{shown_host}:{port}/standalone.html  (no token, no API,")
+    print("              runs entirely in the browser — save it for offline use)")
     if host == "0.0.0.0":
         print("  Phone     : replace 'localhost' with this machine's LAN/VPN IP, keep the token.")
         print("  WARNING   : bound to 0.0.0.0 (all interfaces). Token is the only thing")

@@ -73,9 +73,48 @@ netaudit finding add --title "Telnet exposed" --severity high --host 192.168.10.
 netaudit report --out acme-q2-report.md
 ```
 
-## Run it from your phone (web UI)
+## Run it from your phone
 
-`netaudit` ships a mobile-first web app and REST API. Because the scope-guarded
+There are two phone surfaces, and which one you want depends on whether you need
+to *launch* tooling or just *track* the engagement.
+
+| | Offline app (`standalone.html`) | Server UI (`netaudit serve`) |
+|---|---|---|
+| Needs a server | no — one HTML file | yes, on the on-site box |
+| Can launch `nmap` etc. | no (builds the vetted command for you) | yes, with `--execute` |
+| Checklist, scope gate, findings, report | yes | yes |
+| Where data lives | that browser (export to JSON) | `~/.netaudit` on the server |
+
+### Offline single-file app (works anywhere, no server)
+
+`netaudit/web_static/standalone.html` is the whole app in one dependency-free
+file: the checklist, the scope gate, findings, evidence index and the Markdown
+report generator all run in the browser. Open it from disk, host it on any
+static host, or e-mail it to yourself — it never makes a network request.
+
+```bash
+netaudit standalone --out netaudit-offline.html   # write the file
+```
+
+On iPhone/iPad, open it and use **Share → Add to Home Screen** for an app icon
+and a full-screen, chrome-free window.
+
+It runs the **same gates as the CLI** — the scope checker, the authorization
+gate and the Phase 0 gate are ports of `scope.py`/`runner.py`, and
+`tests/test_standalone.py` runs the JavaScript against the Python and fails if
+their answers ever differ. What it *cannot* do is execute anything: a browser
+has no `nmap`. Instead the Run tab preflights the target and hands you the exact
+vetted command to paste on your on-site box, then lets you record the result in
+the evidence index.
+
+Engagements live in that browser's local storage. **Export regularly** — iOS
+evicts site data from pages you haven't opened in a while. The exported JSON is
+the same schema the CLI reads, so it drops straight into
+`~/.netaudit/engagements/` and you can carry on with `netaudit report`.
+
+### Server UI (drives the real runner)
+
+`netaudit` also ships a mobile-first web app and REST API. Because the scope-guarded
 runner has to launch tools (`nmap`, etc.) on a host that's actually on the client
 network, you run the server on your **on-site testing box** (laptop/NUC/VPS) and use
 your **phone's browser as the control surface**.
@@ -145,6 +184,7 @@ as a pure tracking/reporting surface (just don't rely on `run --execute` there).
 | `run` | Scope-guarded discovery/enumeration runner |
 | `report` | Generate a Markdown report |
 | `serve` | Start the mobile web UI + REST API |
+| `standalone` | Write the offline single-file web app (no server needed) |
 | `agent` | On-site runner for a cloud-hosted engagement (scans locally, uploads evidence) |
 
 ## What the runner will (and won't) do
@@ -178,3 +218,15 @@ PYTHONPATH=. python -m pytest -q
 
 The master checklist is encoded in `netaudit/data/checklist_template.py` — edit there
 to evolve phases or items; item ids stay stable so existing engagements keep tracking.
+
+The offline app embeds a copy of that checklist, so after editing it, rebuild:
+
+```bash
+python -m netaudit.tools.build_standalone        # regenerate standalone.html
+python -m netaudit.tools.build_standalone --check # CI-style staleness check
+```
+
+Edit `web_static/standalone.src.html` (the template), never `standalone.html`
+(generated). `tests/test_standalone.py` fails if the generated file is stale, if
+the embedded runner list drifts from the allowlist, or if the JavaScript and
+Python disagree about scope, gating or report output.

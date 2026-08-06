@@ -1,0 +1,828 @@
+<style>
+:root{
+  --bg:#0b1220; --panel:#121a2b; --panel2:#1b2540; --line:#243150; --field:#0d1426;
+  --txt:#e7ecf6; --muted:#8ea0c4; --accent:#4f9cff; --accent-ink:#071324;
+  --ok:#33c187; --warn:#f0b03a; --crit:#ff5a5a; --high:#ff8a3d; --med:#f0b03a;
+  --low:#5cc8ff; --info:#8ea0c4; --shadow:0 1px 0 rgba(255,255,255,.03);
+  --ink-on-solid:#08131f;
+}
+@media (prefers-color-scheme:light){
+  :root{
+    --bg:#f4f6fb; --panel:#ffffff; --panel2:#eef2fa; --line:#d6dded; --field:#ffffff;
+    --txt:#111a2e; --muted:#5b6b8c; --accent:#1f6feb; --accent-ink:#ffffff;
+    --ok:#0f8a5f; --warn:#a86a00; --crit:#c62828; --high:#c25400; --med:#a86a00;
+    --low:#0b6fa4; --info:#5b6b8c; --shadow:0 1px 2px rgba(16,26,48,.06);
+    --ink-on-solid:#ffffff;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0b1220; --panel:#121a2b; --panel2:#1b2540; --line:#243150; --field:#0d1426;
+  --txt:#e7ecf6; --muted:#8ea0c4; --accent:#4f9cff; --accent-ink:#071324;
+  --ok:#33c187; --warn:#f0b03a; --crit:#ff5a5a; --high:#ff8a3d; --med:#f0b03a;
+  --low:#5cc8ff; --info:#8ea0c4; --shadow:0 1px 0 rgba(255,255,255,.03);
+  --ink-on-solid:#08131f;
+}
+:root[data-theme="light"]{
+  --bg:#f4f6fb; --panel:#ffffff; --panel2:#eef2fa; --line:#d6dded; --field:#ffffff;
+  --txt:#111a2e; --muted:#5b6b8c; --accent:#1f6feb; --accent-ink:#ffffff;
+  --ok:#0f8a5f; --warn:#a86a00; --crit:#c62828; --high:#c25400; --med:#a86a00;
+  --low:#0b6fa4; --info:#5b6b8c; --shadow:0 1px 2px rgba(16,26,48,.06);
+  --ink-on-solid:#ffffff;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--txt);
+  font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  -webkit-text-size-adjust:100%}
+body{padding-bottom:calc(78px + env(safe-area-inset-bottom))}
+.hdr{position:sticky;top:0;z-index:5;background:var(--bg);
+  padding:calc(12px + env(safe-area-inset-top)) 16px 10px 16px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:10px}
+.hdr h1{font-size:17px;margin:0;font-weight:700;letter-spacing:.3px}
+.hdr .sub{color:var(--muted);font-size:12px;max-width:52vw;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.badge{margin-left:auto;font-size:11px;font-weight:700;padding:4px 9px;border-radius:20px;
+  border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.badge.ok{color:var(--ok);border-color:var(--ok)}
+.badge.no{color:var(--crit);border-color:var(--crit)}
+main{padding:14px 14px 20px;max-width:820px;margin:0 auto}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;
+  margin-bottom:12px;box-shadow:var(--shadow)}
+.card h2{font-size:12px;margin:0 0 10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
+.row{display:flex;gap:8px;align-items:center}
+.row.wrap{flex-wrap:wrap}
+.spacer{flex:1}
+button{appearance:none;border:1px solid var(--line);background:var(--panel2);color:var(--txt);
+  padding:11px 13px;border-radius:11px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+button:active{transform:scale(.98)}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button.danger{border-color:var(--crit);color:var(--crit)}
+button.sm{padding:8px 11px;font-size:13px}
+button:disabled{opacity:.45}
+input,select,textarea{width:100%;background:var(--field);border:1px solid var(--line);color:var(--txt);
+  padding:11px;border-radius:10px;font-size:16px;margin:4px 0 8px;font-family:inherit}
+textarea{min-height:70px;resize:vertical;font-size:14px}
+label{font-size:12px;color:var(--muted);display:block;margin-top:6px}
+.muted{color:var(--muted)}
+.tiny{font-size:12px}
+.list-item{display:flex;gap:10px;align-items:flex-start;padding:11px 2px;border-bottom:1px solid var(--line)}
+.list-item:last-child{border-bottom:none}
+.bar{height:8px;background:var(--field);border-radius:6px;overflow:hidden;border:1px solid var(--line)}
+.bar > i{display:block;height:100%;background:var(--accent);transition:width .25s}
+.phase-row{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px solid var(--line)}
+.phase-row:last-child{border-bottom:none}
+.phase-row .nm{flex:1;min-width:0}
+.chk{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);display:flex;
+  align-items:center;justify-content:center;font-size:15px;font-weight:700;flex:0 0 auto;
+  background:var(--field);cursor:pointer;user-select:none}
+.chk.done{background:var(--ok);border-color:var(--ok);color:var(--ink-on-solid)}
+.chk.in_progress{background:var(--warn);border-color:var(--warn);color:var(--ink-on-solid)}
+.chk.na{background:var(--panel2);border-color:var(--line);color:var(--muted)}
+.pill{font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;text-transform:uppercase;
+  white-space:nowrap;flex:0 0 auto}
+.sev-critical{background:var(--crit);color:var(--ink-on-solid)}
+.sev-high{background:var(--high);color:var(--ink-on-solid)}
+.sev-medium{background:var(--med);color:var(--ink-on-solid)}
+.sev-low{background:var(--low);color:var(--ink-on-solid)}
+.sev-info{background:var(--panel2);color:var(--muted);border:1px solid var(--line)}
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--panel);
+  border-top:1px solid var(--line);display:flex;
+  padding:6px 2px calc(6px + env(safe-area-inset-bottom));justify-content:space-around}
+.nav button{background:none;border:none;color:var(--muted);font-size:10.5px;font-weight:600;
+  display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 4px;flex:1;min-width:0}
+.nav button .ic{font-size:18px;line-height:1}
+.nav button.active{color:var(--accent)}
+pre{white-space:pre-wrap;word-break:break-word;background:var(--field);border:1px solid var(--line);
+  border-radius:10px;padding:12px;font-size:12.5px;overflow-x:auto;max-height:58vh;overflow-y:auto;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;margin:8px 0 0}
+.toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom));
+  transform:translateX(-50%);background:var(--panel2);border:1px solid var(--line);color:var(--txt);
+  padding:10px 16px;border-radius:24px;font-size:13px;z-index:20;opacity:0;transition:.25s;
+  pointer-events:none;max-width:90%;text-align:center}
+.toast.show{opacity:1}
+.toast.err{border-color:var(--crit)}
+.hidden{display:none!important}
+.tag{font-size:12px;padding:5px 10px;border:1px solid var(--line);border-radius:20px;color:var(--muted);
+  display:inline-flex;align-items:center;gap:8px;margin:0 6px 6px 0;background:var(--field)}
+.tag b{color:var(--txt);font-weight:600;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.tag .x{cursor:pointer;font-weight:700;opacity:.7}
+.dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+.dot.ok{background:var(--ok)}.dot.no{background:var(--muted)}
+.note{border-left:3px solid var(--accent);padding:8px 10px;background:var(--field);
+  border-radius:0 8px 8px 0;font-size:12.5px;color:var(--muted);margin:8px 0}
+.note.warn{border-left-color:var(--warn)}
+.note.crit{border-left-color:var(--crit)}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--field);
+  padding:1px 5px;border-radius:5px;font-size:.92em;border:1px solid var(--line)}
+a{color:var(--accent)}
+</style>
+
+<div class="hdr">
+  <div style="min-width:0">
+    <h1>netaudit</h1>
+    <div class="sub" id="hsub">engagement control</div>
+  </div>
+  <span class="badge" id="authBadge">—</span>
+</div>
+
+<main id="view"></main>
+<div class="nav" id="nav"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* This page is also served inside wrappers whose <head> we don't control (the
+   generated file has its own meta). Without a viewport meta an iPhone lays the
+   page out at 980px and renders it zoomed out, so ensure one exists. */
+(function(){
+  if(document.querySelector('meta[name="viewport"]')) return;
+  const m=document.createElement("meta");
+  m.name="viewport";
+  m.content="width=device-width, initial-scale=1, viewport-fit=cover";
+  (document.head||document.documentElement).appendChild(m);
+})();
+
+const DATA = /*__NETAUDIT_DATA__*/;
+const TMPL = DATA.template, RUNNERS = DATA.runners;
+
+/* ============================ core (ported from the Python package) ========
+   models.py / scope.py / runner.py / report.py are mirrored here so the app
+   works with no server. Storage is localStorage; exported JSON is byte-level
+   compatible with ~/.netaudit/engagements/<id>.json so the CLI can pick it up.
+   ========================================================================= */
+
+const ITEM_STATES = ["pending","in_progress","done","na"];
+const SEVERITIES  = ["critical","high","medium","low","info"];
+const SEV_ORDER   = {critical:0,high:1,medium:2,low:3,info:4};
+
+function nowISO(){ return new Date().toISOString().replace(/\.\d{3}Z$/,"+00:00"); }
+function newId(prefix){
+  const b = new Uint8Array(4); crypto.getRandomValues(b);
+  return prefix+"-"+Array.from(b).map(x=>x.toString(16).padStart(2,"0")).join("");
+}
+
+/* ---- storage ----
+   localStorage throws (not just returns null) in Safari private browsing and
+   inside sandboxed frames. Fall back to memory so the app still works for the
+   session instead of dying on load; the UI warns that nothing is persisted. */
+const LS_ENG="netaudit.v1.engagements", LS_CUR="netaudit.v1.current";
+const MEM={};
+let STORAGE_OK=true;
+const store={
+  get(k){ try{ return localStorage.getItem(k); }catch(e){ return (k in MEM)?MEM[k]:null; } },
+  set(k,v){ try{ localStorage.setItem(k,v); }catch(e){ STORAGE_OK=false; MEM[k]=v; } },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){ delete MEM[k]; } },
+};
+try{
+  localStorage.setItem("netaudit.probe","1");
+  localStorage.removeItem("netaudit.probe");
+}catch(e){ STORAGE_OK=false; }
+
+function allEngagements(){
+  try{ return JSON.parse(store.get(LS_ENG)||"{}"); }catch(e){ return {}; }
+}
+function saveEngagement(eng){
+  const all=allEngagements(); all[eng.id]=eng;
+  store.set(LS_ENG, JSON.stringify(all));
+}
+function deleteEngagement(id){
+  const all=allEngagements(); delete all[id];
+  store.set(LS_ENG, JSON.stringify(all));
+  if(store.get(LS_CUR)===id) store.del(LS_CUR);
+}
+function loadEngagement(id){ return allEngagements()[id]||null; }
+
+/* ---- engagement model ---- */
+function phaseItems(n){
+  const p = TMPL.phases.find(x=>x.number===n);
+  return p ? p.items : [];
+}
+function initChecklist(eng){
+  TMPL.phases.forEach(p=>p.items.forEach(it=>{
+    if(!eng.checklist[it.id]) eng.checklist[it.id]={state:"pending",note:"",updated:nowISO()};
+  }));
+  TMPL.qa.forEach(q=>{ if(!(q.id in eng.qa)) eng.qa[q.id]=false; });
+}
+function createEngagement(f){
+  const eng={
+    schema:"netaudit.engagement/1", template_version:TMPL.version,
+    id:newId("eng"), name:f.name, client:f.client||"", sow_ref:f.sow||"",
+    lead_auditor:f.auditor||"Aaryon", testing_window:f.window||"", created:nowISO(),
+    authorization:{signed:false,authorizing_officer:"",signed_date:"",letter_path:"",notes:""},
+    scope:{in_scope:[],exclusions:[]}, checklist:{}, qa:{},
+    findings:[], evidence:[], activity:[]
+  };
+  initChecklist(eng);
+  logAct(eng,"engagement.created","Created engagement '"+f.name+"'");
+  return eng;
+}
+function logAct(eng,action,detail){ eng.activity.push({ts:nowISO(),action,detail:detail||""}); }
+function authGranted(eng){
+  const a=eng.authorization;
+  return !!(a.signed && a.authorizing_officer && a.letter_path);
+}
+function setItem(eng,itemId,state,note){
+  if(ITEM_STATES.indexOf(state)<0) throw new Error("bad state");
+  const e = eng.checklist[itemId] || (eng.checklist[itemId]={state:"pending",note:"",updated:nowISO()});
+  e.state=state; if(note) e.note=note; e.updated=nowISO();
+  logAct(eng,"item.update",itemId+" -> "+state);
+}
+function phaseProgress(eng,n){
+  const items=phaseItems(n), total=items.length;
+  if(!total) return [0,0,100.0];
+  let done=0;
+  items.forEach(it=>{ const s=(eng.checklist[it.id]||{}).state; if(s==="done"||s==="na") done++; });
+  return [done,total,Math.round(1000.0*done/total)/10];
+}
+function phaseComplete(eng,n){ const [d,t]=phaseProgress(eng,n); return t>0 && d===t; }
+function addFinding(eng,f){
+  const rec={id:newId("find"),title:f.title,severity:f.severity||"info",
+    phase:(f.phase===undefined?null:f.phase),host:f.host||"",description:f.description||"",
+    cvss:f.cvss||"",business_impact:f.business_impact||"",remediation:f.remediation||"",
+    evidence_refs:[],false_positive:false,created:nowISO()};
+  eng.findings.push(rec);
+  logAct(eng,"finding.add",rec.id+": "+rec.title+" ["+rec.severity+"]");
+  return rec;
+}
+function addEvidence(eng,kind,summary,extra){
+  extra=extra||{};
+  const rec={id:newId("ev"),kind:kind,summary:summary,path:extra.path||"",
+    item_id:extra.item_id||"",finding_id:extra.finding_id||"",created:nowISO()};
+  eng.evidence.push(rec);
+  logAct(eng,"evidence.add",rec.id+": "+summary);
+  return rec;
+}
+
+/* ---- scope.py port (IPv4 exact; anything unparseable falls back to exact
+   string match, which is strictly MORE restrictive than the CLI = fail-safe) */
+function ip4ToInt(s){
+  const p=String(s).split(".");
+  if(p.length!==4) return null;
+  let n=0;
+  for(const o of p){
+    // Reject leading zeros exactly like Python's ipaddress module: "010" is
+    // ambiguous (octal), so 192.168.010.50 is NOT an address. Accepting it
+    // here would let the phone allow a target the CLI blocks.
+    if(!/^(0|[1-9]\d{0,2})$/.test(o)) return null;
+    const v=parseInt(o,10); if(v>255) return null;
+    n=n*256+v;
+  }
+  return n>>>0;
+}
+function intToIp4(n){ return [n>>>24, (n>>>16)&255, (n>>>8)&255, n&255].join("."); }
+/* Mirror of ipaddress.summarize_address_range so a 'a.b.c.d-e' entry reports
+   the same containing CIDR block in its reason string as the CLI does. */
+function trailingZeros(n){
+  if(n===0) return 32;
+  let c=0; while((n & 1)===0){ n=n>>>1; c++; } return c;
+}
+function bitLength(n){ let c=0; while(n>0){ n=Math.floor(n/2); c++; } return c; }
+function summarizeRange(lo,hi){
+  const out=[]; let first=lo;
+  while(first<=hi){
+    const nbits=Math.min(trailingZeros(first), bitLength(hi-first+1)-1);
+    const size=Math.pow(2,nbits);
+    out.push({lo:first,hi:first+size-1,label:intToIp4(first)+"/"+(32-nbits)});
+    first+=size;
+    if(nbits===32) break;
+  }
+  return out;
+}
+function parseEntries(entries){
+  const nets=[], hosts=[];
+  (entries||[]).forEach(raw=>{
+    const entry=String(raw).trim();
+    if(!entry) return;
+    if(entry.indexOf("-")>=0 && entry.indexOf("/")<0){
+      const i=entry.indexOf("-");
+      const startS=entry.slice(0,i).trim();
+      let endS=entry.slice(i+1).trim();
+      const start=ip4ToInt(startS);
+      if(start===null){ hosts.push(entry.toLowerCase()); return; }
+      if(endS.indexOf(".")<0 && endS.indexOf(":")<0){
+        endS = startS.split(".").slice(0,3).concat([endS]).join(".");
+      }
+      const end=ip4ToInt(endS);
+      if(end===null || end<start){ hosts.push(entry.toLowerCase()); return; }
+      summarizeRange(start,end).forEach(n=>nets.push(n));
+      return;
+    }
+    if(entry.indexOf("/")>=0){
+      const parts=entry.split("/");
+      const base=ip4ToInt(parts[0].trim());
+      const bits=parseInt(parts[1],10);
+      if(base===null || isNaN(bits) || bits<0 || bits>32){ hosts.push(entry.toLowerCase()); return; }
+      const mask = bits===0 ? 0 : (0xFFFFFFFF << (32-bits))>>>0;
+      const lo=(base & mask)>>>0;
+      const hi=(lo + (bits===0?0xFFFFFFFF:(Math.pow(2,32-bits)-1)))>>>0;
+      nets.push({lo:lo,hi:hi,label:intToIp4(lo)+"/"+bits});
+      return;
+    }
+    const single=ip4ToInt(entry);
+    if(single!==null){ nets.push({lo:single,hi:single,label:intToIp4(single)+"/32"}); return; }
+    hosts.push(entry.toLowerCase());
+  });
+  return {nets,hosts};
+}
+function scopeCheck(eng,targetRaw){
+  const target=String(targetRaw).trim();
+  const inp=parseEntries(eng.scope.in_scope), exp=parseEntries(eng.scope.exclusions);
+  const asIp=ip4ToInt(target);
+  if(asIp!==null){
+    for(const n of exp.nets)
+      if(asIp>=n.lo && asIp<=n.hi)
+        return {allowed:false,reason:target+" is explicitly EXCLUDED ("+n.label+")"};
+  }
+  if(exp.hosts.indexOf(target.toLowerCase())>=0)
+    return {allowed:false,reason:target+" is explicitly EXCLUDED"};
+  if(asIp!==null){
+    for(const n of inp.nets)
+      if(asIp>=n.lo && asIp<=n.hi)
+        return {allowed:true,reason:target+" in-scope ("+n.label+")"};
+    return {allowed:false,reason:target+" is NOT within any in-scope range"};
+  }
+  if(inp.hosts.indexOf(target.toLowerCase())>=0)
+    return {allowed:true,reason:target+" in-scope (host)"};
+  return {allowed:false,reason:target+" not listed as an in-scope host"};
+}
+
+/* ---- runner.py port: preflight + command building (never execution) ---- */
+function shellQuote(a){
+  return /^[A-Za-z0-9_@%+=:,.\/-]+$/.test(a) ? a : "'"+a.replace(/'/g,"'\\''")+"'";
+}
+function buildCommand(name,target){
+  const spec=RUNNERS.find(r=>r.name===name);
+  return [spec.binary].concat(spec.args.map(a=>a.replace("{target}",target)));
+}
+function preflight(eng,name,target){
+  if(!RUNNERS.some(r=>r.name===name)) throw new Error("Unknown runner '"+name+"'.");
+  if(!authGranted(eng)) throw new Error(
+    "BLOCKED: Phase 0 authorization is not recorded as granted. "+
+    "Record signed authorization + letter before any active tooling.");
+  if(!phaseComplete(eng,0)) throw new Error(
+    "BLOCKED: Phase 0 checklist is not 100% complete. "+
+    "Finish pre-engagement items before touching the network.");
+  const r=scopeCheck(eng,target);
+  if(!r.allowed) throw new Error("BLOCKED by scope: "+r.reason);
+  return buildCommand(name,target);
+}
+
+/* ---- report.py port ---- */
+function markdownReport(eng){
+  const md=[], a=eng.authorization;
+  md.push("# Network Security Audit Report — "+(eng.client||eng.name),"");
+  md.push("- **Engagement:** "+eng.name);
+  md.push("- **Client:** "+(eng.client||"_________"));
+  md.push("- **SOW ref:** "+(eng.sow_ref||"_________"));
+  md.push("- **Lead Auditor:** "+eng.lead_auditor);
+  md.push("- **Testing window:** "+(eng.testing_window||"_________"));
+  md.push("- **Authorization:** "+(authGranted(eng)?"On file":"NOT ON FILE")+
+    (a.authorizing_officer?" (officer: "+a.authorizing_officer+")":""));
+  md.push("");
+  const counts={}; SEVERITIES.forEach(s=>counts[s]=0);
+  eng.findings.forEach(f=>{ if(!f.false_positive) counts[f.severity]=(counts[f.severity]||0)+1; });
+  md.push("## Executive Summary","");
+  md.push("> _Write the non-technical, risk-focused summary here._","");
+  md.push("| Severity | Count |","|----------|-------|");
+  ["critical","high","medium","low","info"].forEach(s=>
+    md.push("| "+s.charAt(0).toUpperCase()+s.slice(1)+" | "+(counts[s]||0)+" |"));
+  md.push("");
+  md.push("## Scope","");
+  md.push("**In scope:** "+(eng.scope.in_scope.join(", ")||"_none recorded_"),"");
+  md.push("**Explicit exclusions:** "+(eng.scope.exclusions.join(", ")||"_none_"),"");
+  md.push("## Technical Findings","");
+  const active=eng.findings.filter(f=>!f.false_positive);
+  if(!active.length) md.push("_No findings recorded yet._","");
+  active.slice().sort((x,y)=>(SEV_ORDER[x.severity]===undefined?9:SEV_ORDER[x.severity])-
+                             (SEV_ORDER[y.severity]===undefined?9:SEV_ORDER[y.severity]))
+  .forEach(f=>{
+    md.push("### ["+f.severity.toUpperCase()+"] "+f.title,"");
+    if(f.host) md.push("- **Affected host:** "+f.host);
+    if(f.cvss) md.push("- **CVSS:** "+f.cvss);
+    if(f.phase!==null && f.phase!==undefined) md.push("- **Discovered in phase:** "+f.phase);
+    md.push("","**Description**","",f.description||"_TODO_","");
+    md.push("**Business impact**","",f.business_impact||"_TODO_","");
+    md.push("**Remediation**","",f.remediation||"_TODO_","");
+    if(f.evidence_refs && f.evidence_refs.length) md.push("**Evidence:** "+f.evidence_refs.join(", "),"");
+  });
+  md.push("## Checklist Coverage","");
+  md.push("| Phase | Name | Complete |","|-------|------|----------|");
+  TMPL.phases.forEach(p=>{
+    const pr=phaseProgress(eng,p.number);
+    md.push("| "+p.number+" | "+p.name+" | "+pr[0]+"/"+pr[1]+" ("+pr[2].toFixed(1)+"%) |");
+  });
+  md.push("");
+  md.push("## Final QA Recheck","");
+  TMPL.qa.forEach(q=>md.push("- ["+(eng.qa[q.id]?"x":" ")+"] "+q.text));
+  md.push("");
+  md.push("## Evidence Index","");
+  if(eng.evidence.length){
+    md.push("| ID | Kind | Summary | Path |","|----|------|---------|------|");
+    eng.evidence.forEach(e=>md.push("| "+e.id+" | "+e.kind+" | "+e.summary+" | "+(e.path||"-")+" |"));
+  }else md.push("_No evidence recorded yet._");
+  md.push("");
+  return md.join("\n");
+}
+
+/* ================================ UI ==================================== */
+const $=s=>document.querySelector(s);
+const esc=s=>(s==null?"":String(s)).replace(/[&<>"']/g,c=>
+  ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+let STATE={tab:"engagements",engId:store.get(LS_CUR)||null,eng:null,openPhase:null};
+
+function toast(msg,err){
+  const t=$("#toast"); t.textContent=msg; t.className="toast show"+(err?" err":"");
+  clearTimeout(toast._t); toast._t=setTimeout(()=>t.className="toast",2800);
+}
+const TABS=[
+ {id:"engagements",ic:"▦",label:"Jobs"},
+ {id:"phases",ic:"☑",label:"Phases"},
+ {id:"scope",ic:"◎",label:"Scope"},
+ {id:"findings",ic:"⚑",label:"Findings"},
+ {id:"run",ic:"⚡",label:"Run"},
+ {id:"report",ic:"▤",label:"Report"},
+];
+function renderNav(){
+  $("#nav").innerHTML=TABS.map(t=>
+    `<button data-tab="${t.id}" class="${STATE.tab===t.id?"active":""}">
+      <span class="ic">${t.ic}</span>${t.label}</button>`).join("");
+  $("#nav").querySelectorAll("button").forEach(b=>b.onclick=()=>{
+    if(b.dataset.tab!=="engagements" && !STATE.eng){ toast("Pick or create a job first"); return; }
+    STATE.tab=b.dataset.tab; STATE.openPhase=null; render();
+  });
+}
+function persist(){ saveEngagement(STATE.eng); }
+function setBadge(){
+  const b=$("#authBadge");
+  if(!STATE.eng){ b.className="badge"; b.textContent="—"; return; }
+  const g=authGranted(STATE.eng);
+  b.className="badge "+(g?"ok":"no"); b.textContent=g?"AUTHORIZED":"NOT AUTHORIZED";
+}
+function render(){
+  renderNav();
+  if(STATE.engId && !STATE.eng) STATE.eng=loadEngagement(STATE.engId);
+  if(STATE.eng) initChecklist(STATE.eng);
+  setBadge();
+  $("#hsub").textContent=STATE.eng?STATE.eng.name:"engagement control";
+  ({engagements:viewEngagements,phases:viewPhases,scope:viewScope,
+    findings:viewFindings,run:viewRun,report:viewReport}[STATE.tab]||viewEngagements)();
+  window.scrollTo(0,0);
+}
+
+/* ---- Jobs ---- */
+function viewEngagements(){
+  const all=allEngagements(), ids=Object.keys(all);
+  $("#view").innerHTML=`
+   <div class="card"><h2>New engagement</h2>
+     <label>Name</label><input id="e_name" placeholder="acme-q2" autocapitalize="none">
+     <label>Client</label><input id="e_client" placeholder="Acme Corp">
+     <label>SOW ref</label><input id="e_sow" placeholder="SOW-2026-014">
+     <button class="primary" id="b_create">Create</button>
+   </div>
+   <div class="card"><h2>Engagements (${ids.length})</h2>
+   ${ids.length?ids.map(id=>{const e=all[id];return `
+     <div class="list-item">
+       <div style="flex:1;min-width:0">
+         <b>${esc(e.name)}</b><br>
+         <span class="tiny muted">${esc(e.client||"no client")} · ${esc(e.id)}</span><br>
+         <span class="pill ${authGranted(e)?"sev-low":"sev-critical"}" style="margin-top:4px;display:inline-block">
+           ${authGranted(e)?"authorized":"not authorized"}</span>
+       </div>
+       <button class="sm ${STATE.engId===id?"primary":""}" data-open="${esc(id)}">
+         ${STATE.engId===id?"current":"open"}</button>
+     </div>`;}).join(""):'<p class="muted tiny">None yet — create one above.</p>'}
+   </div>
+   ${STATE.eng?authCard():""}
+   ${dataCard()}`;
+  $("#b_create").onclick=()=>{
+    const name=$("#e_name").value.trim();
+    if(!name) return toast("name required",true);
+    const eng=createEngagement({name,client:$("#e_client").value.trim(),sow:$("#e_sow").value.trim()});
+    saveEngagement(eng); pickEng(eng.id); toast("Created "+eng.name);
+  };
+  $("#view").querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>pickEng(b.dataset.open));
+  if(STATE.eng) wireAuthCard();
+  wireDataCard();
+}
+function pickEng(id){
+  STATE.engId=id; STATE.eng=loadEngagement(id);
+  store.set(LS_CUR,id); render();
+}
+function authCard(){
+  const a=STATE.eng.authorization, p0=phaseProgress(STATE.eng,0);
+  return `<div class="card"><h2>Phase 0 — Authorization gate</h2>
+   <div class="note ${authGranted(STATE.eng)?"":"crit"}">Scans stay blocked until this is granted
+     (signed + officer + letter path) <b>and</b> the Phase 0 checklist is 100% complete.
+     Phase 0 is at ${p0[0]}/${p0[1]}.</div>
+   <label>Authorizing officer</label><input id="a_off" value="${esc(a.authorizing_officer)}">
+   <label>Signed date</label><input id="a_date" value="${esc(a.signed_date)}" placeholder="2026-06-14">
+   <label>Get-out-of-jail letter path</label>
+   <input id="a_letter" value="${esc(a.letter_path)}" placeholder="/secure/acme-auth.pdf" autocapitalize="none">
+   <div class="row" style="margin-top:8px">
+     <label style="margin:0">Signed authorization on file</label><div class="spacer"></div>
+     <button class="sm ${a.signed?"primary":""}" id="b_grant">${a.signed?"YES":"mark signed"}</button></div>
+   <button class="primary" style="margin-top:10px;width:100%" id="b_saveauth">Save authorization</button>
+  </div>`;
+}
+function wireAuthCard(){
+  $("#b_grant").onclick=()=>{
+    STATE.eng.authorization.signed=!STATE.eng.authorization.signed;
+    logAct(STATE.eng,"authorization.update","granted="+authGranted(STATE.eng));
+    persist(); render();
+  };
+  $("#b_saveauth").onclick=()=>{
+    const a=STATE.eng.authorization;
+    a.authorizing_officer=$("#a_off").value.trim();
+    a.signed_date=$("#a_date").value.trim();
+    a.letter_path=$("#a_letter").value.trim();
+    logAct(STATE.eng,"authorization.update","granted="+authGranted(STATE.eng));
+    persist(); render(); toast("Authorization saved");
+  };
+}
+function dataCard(){
+  return `<div class="card"><h2>Data</h2>
+   ${STORAGE_OK?"":`<div class="note crit"><b>Storage unavailable.</b> This browser is
+     blocking local storage (private browsing or a sandboxed frame), so anything you
+     enter is lost when you close the tab. Export before you leave.</div>`}
+   <div class="note">Everything lives in this browser only. Export regularly — iOS can evict
+     site data. The exported JSON drops straight into
+     <code>~/.netaudit/engagements/</code> for the CLI.</div>
+   <div class="row wrap">
+     <button class="sm" id="b_export" ${STATE.eng?"":"disabled"}>Export current</button>
+     <button class="sm" id="b_exportall">Export all</button>
+     <button class="sm" id="b_import">Import JSON</button>
+     ${STATE.eng?`<button class="sm danger" id="b_del">Delete current</button>`:""}
+   </div>
+   <input type="file" id="f_import" accept="application/json,.json" class="hidden" multiple>
+  </div>`;
+}
+function download(name,text,mime){
+  const b=new Blob([text],{type:mime||"application/json"});
+  const u=URL.createObjectURL(b), a=document.createElement("a");
+  a.href=u; a.download=name; document.body.appendChild(a); a.click();
+  document.body.removeChild(a); setTimeout(()=>URL.revokeObjectURL(u),1000);
+}
+function wireDataCard(){
+  const ex=$("#b_export");
+  if(ex) ex.onclick=()=>{
+    if(!STATE.eng) return;
+    download(STATE.eng.id+".json", JSON.stringify(STATE.eng,null,2));
+    toast("Exported "+STATE.eng.id+".json");
+  };
+  $("#b_exportall").onclick=()=>{
+    const all=allEngagements();
+    if(!Object.keys(all).length) return toast("nothing to export",true);
+    download("netaudit-export-"+new Date().toISOString().slice(0,10)+".json",
+      JSON.stringify({schema:"netaudit.bundle/1",exported:nowISO(),
+        engagements:Object.values(all)},null,2));
+    toast("Exported all engagements");
+  };
+  $("#b_import").onclick=()=>$("#f_import").click();
+  $("#f_import").onchange=async(e)=>{
+    let n=0;
+    for(const file of Array.from(e.target.files||[])){
+      try{
+        const data=JSON.parse(await file.text());
+        const list = data && data.engagements ? data.engagements : [data];
+        list.forEach(eng=>{
+          if(!eng || !eng.id || !eng.name) throw new Error("not a netaudit engagement");
+          eng.checklist=eng.checklist||{}; eng.qa=eng.qa||{};
+          eng.findings=eng.findings||[]; eng.evidence=eng.evidence||[];
+          eng.activity=eng.activity||[];
+          eng.scope=eng.scope||{in_scope:[],exclusions:[]};
+          eng.scope.in_scope=eng.scope.in_scope||[]; eng.scope.exclusions=eng.scope.exclusions||[];
+          eng.authorization=eng.authorization||{signed:false,authorizing_officer:"",
+            signed_date:"",letter_path:"",notes:""};
+          initChecklist(eng); saveEngagement(eng); n++;
+        });
+      }catch(err){ toast("Import failed: "+err.message,true); }
+    }
+    e.target.value="";
+    if(n){ toast("Imported "+n+" engagement"+(n===1?"":"s")); render(); }
+  };
+  const del=$("#b_del");
+  if(del) del.onclick=()=>{
+    if(!confirm("Delete "+STATE.eng.name+" from this browser? Export first if you need it."))return;
+    deleteEngagement(STATE.eng.id); STATE.eng=null; STATE.engId=null; render(); toast("Deleted");
+  };
+}
+
+/* ---- Phases ---- */
+const NEXT={pending:"in_progress",in_progress:"done",done:"na",na:"pending"};
+const GLYPH={pending:"",in_progress:"~",done:"✓",na:"–"};
+function viewPhases(){
+  const qaDone=TMPL.qa.filter(q=>STATE.eng.qa[q.id]).length;
+  $("#view").innerHTML=`
+   <div class="card"><h2>Phase progress</h2>
+   ${TMPL.phases.map(p=>{const pr=phaseProgress(STATE.eng,p.number);
+     return `<div class="phase-row" data-phase="${p.number}" style="cursor:pointer">
+       <div class="nm"><b>P${p.number} · ${esc(p.name)}</b>${p.optional?' <span class="tiny muted">(optional)</span>':""}
+         <div class="bar" style="margin-top:6px"><i style="width:${pr[2]}%"></i></div></div>
+       <span class="tiny muted">${pr[0]}/${pr[1]}</span></div>`;}).join("")}</div>
+   <div id="phaseDetail"></div>
+   <div class="card"><h2>Final QA recheck (${qaDone}/${TMPL.qa.length})</h2>
+   ${TMPL.qa.map(q=>`<div class="phase-row">
+     <div class="chk ${STATE.eng.qa[q.id]?"done":""}" data-qa="${q.id}">${STATE.eng.qa[q.id]?"✓":""}</div>
+     <div class="nm tiny">${esc(q.text)}</div></div>`).join("")}</div>`;
+  $("#view").querySelectorAll("[data-phase]").forEach(r=>
+    r.onclick=()=>{STATE.openPhase=parseInt(r.dataset.phase,10);renderPhaseDetail(true);});
+  $("#view").querySelectorAll("[data-qa]").forEach(c=>c.onclick=()=>{
+    const id=c.dataset.qa; STATE.eng.qa[id]=!STATE.eng.qa[id];
+    logAct(STATE.eng,"qa.update",id+"="+STATE.eng.qa[id]); persist(); viewPhases();
+  });
+  if(STATE.openPhase!==null) renderPhaseDetail(false);
+}
+function renderPhaseDetail(scroll){
+  const n=STATE.openPhase, p=TMPL.phases.find(x=>x.number===n);
+  if(!p) return;
+  $("#phaseDetail").innerHTML=`<div class="card"><h2>P${n} · ${esc(p.name)}</h2>
+   <div class="note">${esc(p.intent)}</div>
+   <p class="tiny muted">Tap a box to cycle: pending → in&nbsp;progress → done → n/a</p>
+   ${p.items.map(it=>{const st=(STATE.eng.checklist[it.id]||{}).state||"pending";
+     const note=(STATE.eng.checklist[it.id]||{}).note;
+     return `<div class="phase-row">
+       <div class="chk ${st}" data-item="${it.id}" data-state="${st}">${GLYPH[st]}</div>
+       <div class="nm tiny">${esc(it.text)}<br>
+         <span class="muted">${it.id}</span>${note?` <span class="muted">// ${esc(note)}</span>`:""}</div>
+       </div>`;}).join("")}
+   <p class="tiny muted" style="margin-top:10px">Tools: ${p.tools.map(esc).join(" · ")}</p></div>`;
+  $("#phaseDetail").querySelectorAll("[data-item]").forEach(c=>c.onclick=()=>{
+    setItem(STATE.eng,c.dataset.item,NEXT[c.dataset.state]); persist(); viewPhases();
+  });
+  if(scroll) $("#phaseDetail").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+/* ---- Scope ---- */
+function viewScope(){
+  const s=STATE.eng.scope;
+  $("#view").innerHTML=`
+   <div class="card"><h2>Scope check</h2>
+     <input id="sc_t" placeholder="192.168.1.50 or dc01.acme.local" autocapitalize="none" autocorrect="off">
+     <button class="primary" id="b_check" style="width:100%">Check target</button>
+     <div id="sc_res" class="tiny" style="margin-top:10px"></div></div>
+   <div class="card"><h2>Add entries</h2>
+     <input id="sc_add" placeholder="192.168.1.0/24, dc01.acme.local, 10.0.0.1-20"
+       autocapitalize="none" autocorrect="off">
+     <div class="row"><button class="primary" id="b_add" style="flex:1">In scope</button>
+       <button id="b_ex" style="flex:1">Exclude</button></div></div>
+   <div class="card"><h2>In scope (${s.in_scope.length})</h2>
+     ${s.in_scope.map(t=>`<span class="tag"><b>${esc(t)}</b>
+       <span class="x" data-rm="${esc(t)}">✕</span></span>`).join("")
+       ||'<span class="muted tiny">none</span>'}</div>
+   <div class="card"><h2>Exclusions (${s.exclusions.length})</h2>
+     <div class="note warn">Exclusions always win over in-scope entries.</div>
+     ${s.exclusions.map(t=>`<span class="tag"><b>${esc(t)}</b>
+       <span class="x" data-rm="${esc(t)}">✕</span></span>`).join("")
+       ||'<span class="muted tiny">none</span>'}</div>`;
+  $("#b_check").onclick=()=>{
+    const t=$("#sc_t").value.trim(); if(!t) return;
+    const r=scopeCheck(STATE.eng,t);
+    $("#sc_res").innerHTML=`<b style="color:${r.allowed?"var(--ok)":"var(--crit)"}">
+      ${r.allowed?"ALLOWED":"BLOCKED"}</b> — ${esc(r.reason)}`;
+  };
+  const addTo=(key,action)=>{
+    const vals=$("#sc_add").value.split(",").map(x=>x.trim()).filter(Boolean);
+    if(!vals.length) return;
+    vals.forEach(v=>{ if(STATE.eng.scope[key].indexOf(v)<0) STATE.eng.scope[key].push(v); });
+    logAct(STATE.eng,"scope.update",action+": "+vals.join(", "));
+    persist(); viewScope(); toast("Scope updated");
+  };
+  $("#b_add").onclick=()=>addTo("in_scope","add");
+  $("#b_ex").onclick=()=>addTo("exclusions","exclude");
+  $("#view").querySelectorAll("[data-rm]").forEach(x=>x.onclick=()=>{
+    const t=x.dataset.rm;
+    STATE.eng.scope.in_scope=STATE.eng.scope.in_scope.filter(v=>v!==t);
+    STATE.eng.scope.exclusions=STATE.eng.scope.exclusions.filter(v=>v!==t);
+    logAct(STATE.eng,"scope.update","remove: "+t);
+    persist(); viewScope();
+  });
+}
+
+/* ---- Findings ---- */
+function viewFindings(){
+  const f=STATE.eng.findings;
+  $("#view").innerHTML=`
+   <div class="card"><h2>Add finding</h2>
+     <label>Title</label><input id="f_title" placeholder="Telnet exposed on core switch">
+     <label>Severity</label><select id="f_sev">
+       ${SEVERITIES.map(s=>`<option value="${s}"${s==="info"?" selected":""}>${s}</option>`).join("")}</select>
+     <label>Host</label><input id="f_host" autocapitalize="none" placeholder="192.168.10.5">
+     <label>CVSS</label><input id="f_cvss" placeholder="7.3" inputmode="decimal">
+     <label>Description</label><textarea id="f_desc"></textarea>
+     <label>Business impact</label><textarea id="f_impact"></textarea>
+     <label>Remediation</label><textarea id="f_rem"></textarea>
+     <button class="primary" id="b_addf" style="width:100%">Add finding</button></div>
+   <div class="card"><h2>Findings (${f.length})</h2>
+   ${f.length?f.slice().sort((a,b)=>SEV_ORDER[a.severity]-SEV_ORDER[b.severity]).map(x=>`
+     <div class="list-item">
+       <span class="pill sev-${x.severity}">${x.severity}</span>
+       <div style="flex:1;min-width:0"><b>${esc(x.title)}</b><br>
+         <span class="tiny muted">${esc(x.host||"—")}${x.cvss?" · CVSS "+esc(x.cvss):""}</span></div>
+       <button class="sm danger" data-rmf="${x.id}">✕</button>
+     </div>`).join(""):'<p class="muted tiny">none</p>'}</div>`;
+  $("#b_addf").onclick=()=>{
+    const title=$("#f_title").value.trim();
+    if(!title) return toast("title required",true);
+    addFinding(STATE.eng,{title,severity:$("#f_sev").value,host:$("#f_host").value.trim(),
+      cvss:$("#f_cvss").value.trim(),description:$("#f_desc").value.trim(),
+      business_impact:$("#f_impact").value.trim(),remediation:$("#f_rem").value.trim()});
+    persist(); viewFindings(); toast("Finding added");
+  };
+  $("#view").querySelectorAll("[data-rmf]").forEach(b=>b.onclick=()=>{
+    if(!confirm("Remove this finding?")) return;
+    STATE.eng.findings=STATE.eng.findings.filter(x=>x.id!==b.dataset.rmf);
+    logAct(STATE.eng,"finding.remove",b.dataset.rmf);
+    persist(); viewFindings();
+  });
+}
+
+/* ---- Run (build + gate commands; execution happens on the on-site box) ---- */
+function viewRun(){
+  const granted=authGranted(STATE.eng), p0=phaseComplete(STATE.eng,0);
+  $("#view").innerHTML=`
+   <div class="card"><h2>Scope-guarded command builder</h2>
+     <div class="note ${granted&&p0?"":"warn"}">
+       This browser can't launch <code>nmap</code> — nothing here touches a network.
+       It runs the <b>same gates as the CLI</b> (authorization + Phase 0 + scope) and
+       hands you the exact vetted command to paste on your on-site box.<br><br>
+       Authorization: <b style="color:${granted?"var(--ok)":"var(--crit)"}">${granted?"granted":"NOT granted"}</b> ·
+       Phase 0 complete: <b style="color:${p0?"var(--ok)":"var(--crit)"}">${p0?"yes":"no"}</b>
+     </div>
+     <label>Target (must be in scope)</label>
+     <input id="r_t" placeholder="192.168.10.50" autocapitalize="none" autocorrect="off">
+     <label>Runner</label><select id="r_name">
+       ${RUNNERS.map(r=>`<option value="${r.name}">${r.name} · P${r.phase} · ${r.binary}</option>`).join("")}</select>
+     <button class="primary" id="b_build" style="width:100%">Check scope &amp; build command</button>
+     <pre id="r_out" class="hidden"></pre>
+     <div class="row wrap hidden" id="r_acts" style="margin-top:8px">
+       <button class="sm" id="b_copy">Copy command</button>
+       <button class="sm" id="b_logev">Log as evidence</button></div>
+   </div>
+   <div class="card"><h2>Paste captured output</h2>
+     <p class="tiny muted">Ran it on the testing box? Paste the output here to keep the
+       evidence index complete.</p>
+     <label>Summary</label><input id="ev_sum" placeholder="nmap -sn 192.168.10.0/24">
+     <label>Evidence path on the testing box</label>
+     <input id="ev_path" placeholder="~/.netaudit/evidence/eng-…/host-discovery__…txt" autocapitalize="none">
+     <button class="primary" id="b_ev" style="width:100%">Add evidence entry</button></div>
+   <div class="card"><h2>Available runners (${RUNNERS.length})</h2>
+     <p class="tiny muted">Discovery / enumeration / read-only only. Exploitation, password
+       cracking and auth brute-forcing stay manual by design.</p>
+     ${RUNNERS.map(r=>`<div class="phase-row">
+       <span class="dot ok"></span>
+       <div class="nm tiny"><b>${esc(r.name)}</b> · P${r.phase} · <code>${esc(r.binary)}</code><br>
+         <span class="muted">${esc(r.desc)}</span></div></div>`).join("")}</div>`;
+  $("#b_build").onclick=()=>{
+    const target=$("#r_t").value.trim(), name=$("#r_name").value;
+    const out=$("#r_out"), acts=$("#r_acts");
+    if(!target){ toast("target required",true); return; }
+    try{
+      const argv=preflight(STATE.eng,name,target);
+      const cmd=argv.map(shellQuote).join(" ");
+      window._cmd=cmd; window._cmdName=name; window._cmdTarget=target;
+      out.className=""; acts.className="row wrap";
+      out.textContent="SCOPE OK — not executed here.\n\nRun this on the on-site box:\n\n$ "+cmd;
+      logAct(STATE.eng,"run.dryrun","["+name+"] "+cmd); persist();
+    }catch(e){
+      out.className=""; acts.className="row wrap hidden";
+      out.textContent=e.message; toast("Blocked",true);
+    }
+  };
+  $("#b_copy").onclick=()=>{
+    if(!window._cmd) return;
+    navigator.clipboard.writeText(window._cmd).then(
+      ()=>toast("Command copied"),()=>toast("Copy failed — select the text",true));
+  };
+  $("#b_logev").onclick=()=>{
+    if(!window._cmd) return;
+    addEvidence(STATE.eng,"command",window._cmdName+" against "+window._cmdTarget+" (built on phone)");
+    persist(); toast("Logged to evidence index");
+  };
+  $("#b_ev").onclick=()=>{
+    const sum=$("#ev_sum").value.trim();
+    if(!sum) return toast("summary required",true);
+    addEvidence(STATE.eng,"command",sum,{path:$("#ev_path").value.trim()});
+    persist(); $("#ev_sum").value=""; $("#ev_path").value=""; toast("Evidence added");
+  };
+}
+
+/* ---- Report ---- */
+function viewReport(){
+  const md=markdownReport(STATE.eng);
+  window._rep=md;
+  $("#view").innerHTML=`<div class="card"><h2>Markdown report</h2>
+    <div class="row wrap"><button class="sm" id="b_cp">Copy</button>
+      <button class="sm" id="b_dl">Download .md</button>
+      <button class="sm" id="b_sh">Share</button></div>
+    <pre>${esc(md)}</pre></div>`;
+  $("#b_cp").onclick=()=>navigator.clipboard.writeText(md).then(
+    ()=>toast("Copied"),()=>toast("Copy failed",true));
+  $("#b_dl").onclick=()=>download((STATE.eng.name||"report")+".md",md,"text/markdown");
+  $("#b_sh").onclick=async()=>{
+    if(!navigator.share) return toast("Sharing not available here",true);
+    try{ await navigator.share({title:STATE.eng.name+" report",text:md}); }
+    catch(e){ /* user cancelled */ }
+  };
+}
+
+render();
+</script>

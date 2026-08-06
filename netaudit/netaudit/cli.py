@@ -244,6 +244,17 @@ def cmd_serve(args) -> None:
     web.serve(host=args.host, port=args.port, token=args.token)
 
 
+def cmd_standalone(args) -> None:
+    """Write the offline single-file web app to disk."""
+    from .tools import build_standalone
+    dest = Path(args.out)
+    dest.write_text(build_standalone.render_document(), encoding="utf-8")
+    _ok(f"Wrote {dest} ({dest.stat().st_size:,} bytes)")
+    _ok("Open it in any browser, or host it anywhere — it needs no server.")
+    _ok("Engagements are stored in that browser; use its Export button to get")
+    _ok("JSON you can drop into ~/.netaudit/engagements/ for this CLI.")
+
+
 def cmd_agent(args) -> None:
     import os
     from . import agent, runner as _runner
@@ -380,6 +391,16 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--port", type=int, default=8765)
     sp.add_argument("--token", help="Access token (else NETAUDIT_TOKEN or a random one).")
     sp.set_defaults(func=cmd_serve)
+
+    sp = sub.add_parser(
+        "standalone",
+        help="Write the offline single-file web app (no server needed).",
+        description="Emit a self-contained HTML file that runs the checklist, "
+                    "scope gate and report generator entirely in the browser. "
+                    "Useful on a phone, or anywhere you can't run the server.",
+    )
+    sp.add_argument("--out", default="netaudit-offline.html", help="Output path.")
+    sp.set_defaults(func=cmd_standalone)
 
     sp = sub.add_parser(
         "agent",
