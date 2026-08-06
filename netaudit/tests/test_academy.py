@@ -89,6 +89,8 @@ def test_terminal_is_a_draggable_persistent_utility():
         "function renderLabDetail",
     ]:
         assert marker in text
+    assert "openFloatingTerminal('${l.id}',true)" not in text
+    assert ".termline input{font-size:16px}" in text
 
 
 def test_boxes_open_details_and_tracking_stays_in_profile():
