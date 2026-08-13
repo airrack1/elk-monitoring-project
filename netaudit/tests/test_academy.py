@@ -117,3 +117,19 @@ def test_box_guide_and_live_terminal_objectives_are_present():
         "let guestLabs={}",
     ]:
         assert marker in text
+
+
+def test_profile_handoff_and_mobile_export_are_resilient():
+    for marker in [
+        "let pendingView=null",
+        "pendingView=v;openProfileModal()",
+        "closeProfileModal(true)",
+        'label for="profileName"',
+        'aria-label="Search study boxes"',
+        'aria-label="Filter study boxes by track"',
+        'aria-label="Search forum discussions"',
+        "document.body.appendChild(a)",
+        "setTimeout(()=>URL.revokeObjectURL(url),1000)",
+    ]:
+        assert marker in text
+    assert text.count('label for="profileName"') == 1
