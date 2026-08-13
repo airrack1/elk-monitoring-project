@@ -61,3 +61,10 @@
 - The latest PR workflow on the remote head succeeded across Python 3.9–3.12 and Docker build. The prior push workflow passed those jobs but failed in `Trigger cloud deploy (Render deploy hook)`.
 - GitHub reports zero deployments. `https://netaudit.onrender.com/api/ping` returned 404 and the configured Fly hostname was unreachable; no deployment URL could be verified.
 - Local QA server and browser tabs were stopped/closed after testing.
+
+## 2026-08-13 14:20 EDT — Resumed delivery
+
+- GitHub authentication was completed externally; local and remote branch heads now match at `8590d6d27a3e0803424d3c2e94b4696cb833fca0`.
+- PR #1 updated successfully and is mergeable. Its Python 3.9–3.12 matrix and Docker build all passed.
+- Inspected the failed push-workflow annotation. Root cause: the checkout-free deploy job inherited the workflow-wide `working-directory: netaudit`; without a checkout that directory does not exist, so GitHub could not start `/usr/bin/bash` and never called Render.
+- Fixed the deploy job to override its run directory to the existing workspace root and added a regression test that preserves the checkout-free design.

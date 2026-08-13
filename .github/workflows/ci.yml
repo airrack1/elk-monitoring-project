@@ -46,6 +46,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test, docker-build]
     if: github.event_name == 'push'
+    defaults:
+      run:
+        # This job intentionally does not check out the repository. Override
+        # the workflow-wide `netaudit` directory so Bash starts successfully.
+        working-directory: .
     steps:
       - name: Trigger cloud deploy (Render deploy hook)
         env:
