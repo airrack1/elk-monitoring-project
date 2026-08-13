@@ -50,3 +50,14 @@
 - Sensitive credential/private-key pattern scan across tracked files: zero matches.
 - Docker validation is unavailable because Docker is not installed on this computer; the CI workflow includes the canonical Docker build and will be monitored after push.
 - Final diff review caught and removed a transient duplicate form label before commit; focused Academy suite remained green at 13 passed.
+
+## 2026-08-13 14:05 EDT — Delivery and deployment status
+
+- Implementation committed locally as `5d60cc5fad7d258d1c7cefe144dd462db15187f1` (`Polish Academy profile and mobile flows`).
+- HTTPS push invoked Git Credential Manager and stalled awaiting interactive GitHub authentication. The Windows automation safety policy prohibits automating authentication dialogs, so the prompt was not controlled.
+- Non-interactive HTTPS retry failed because no stored credential is available.
+- Verified GitHub's SSH host key against official GitHub documentation and tried SSH with an isolated task-specific known-hosts file; GitHub rejected it because this computer has no authorized SSH key.
+- PR #1 remains open and ready-for-review, targeting `claude/automation-system-28npcl`; its remote head remains `c3aa8576c07f2f152f4eae411c9ffd226dcda023` because push authentication is blocked.
+- The latest PR workflow on the remote head succeeded across Python 3.9–3.12 and Docker build. The prior push workflow passed those jobs but failed in `Trigger cloud deploy (Render deploy hook)`.
+- GitHub reports zero deployments. `https://netaudit.onrender.com/api/ping` returned 404 and the configured Fly hostname was unreachable; no deployment URL could be verified.
+- Local QA server and browser tabs were stopped/closed after testing.
