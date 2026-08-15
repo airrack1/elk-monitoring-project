@@ -14,7 +14,8 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  # A pull-request verification must never cancel the matching push deploy.
+  group: pages-${{ github.event_name }}
   cancel-in-progress: true
 
 jobs:
