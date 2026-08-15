@@ -1,0 +1,10 @@
+{
+  "name": "nightrange",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A self-contained browser-based cyber range",
+  "scripts": {
+    "test": "node tests/smoke.mjs"
+  }
+}
+

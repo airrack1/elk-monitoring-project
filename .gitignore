@@ -1,14 +1,10 @@
-# Python
-__pycache__/
-*.py[cod]
-*.egg-info/
-.eggs/
-build/
-dist/
-.pytest_cache/
+node_modules/
+playwright-report/
+test-results/
 .venv/
-venv/
-
-# netaudit local engagement data (never commit client data / evidence)
-.netaudit/
-*.netaudit/
+build/
+*.egg-info/
+__pycache__/
+.pytest_cache/
+.DS_Store
+Thumbs.db
