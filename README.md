@@ -18,7 +18,6 @@ npm test
 
 ## Publish updates
 
-Push to `main` or `claude/web-app-iphone-browser-5w9pv9`. GitHub Actions validates the standalone app and publishes the latest commit to GitHub Pages.
+Push to `claude/automation-system-28npcl`, the repository's default branch. GitHub Actions validates the standalone app and publishes the latest commit to GitHub Pages.
 
 The public site is independent of Claude. Visitors see only NIGHTRANGE and cannot see the owner's Claude account or email.
-

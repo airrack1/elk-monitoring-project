@@ -3,8 +3,7 @@ name: Verify and deploy NIGHTRANGE
 on:
   push:
     branches:
-      - main
-      - claude/web-app-iphone-browser-5w9pv9
+      - claude/automation-system-28npcl
   pull_request:
   workflow_dispatch:
 
